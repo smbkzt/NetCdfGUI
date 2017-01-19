@@ -1,53 +1,55 @@
 import ucar.ma2.Array;
 import ucar.ma2.InvalidRangeException;
+import ucar.nc2.NCdumpW;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
 
 public class Reader {
     private NetcdfFile nc = null;
-    private String fileName;
-    private Scanner scanner;
+    private String filePath;
 
 
     public Reader(String filePath){
-        fileName = filePath;
-        scanner = new Scanner(System.in);
+        this.filePath = filePath;
     }
 
-    public void readWholeFile(){
+    public String readWholeFile(){
         try {
-            nc = NetcdfDataset.open(fileName, null);
-//            System.out.println("Краткое описание файла: " + nc.findGlobalAttribute("title").getStringValue());
+            nc = NetcdfDataset.open(filePath, null);
 //            System.out.println(nc.getDimensions().size());
-            System.out.println(nc);
-            System.out.println("---------------------------------");
-            System.out.println("Хотите построить диаграмму? д/н ");
-            System.out.println("---------------------------------");
-            String answer = scanner.next();
-
-            if (answer.equals("д")){
-                getData();
-            }
-            else {
-                return;
-            }
         }
         catch (IOException ioe) {
-            System.out.println("При попытке открыть файл " + fileName + " произошла ошибка: " + ioe);
-
+            System.out.println("При попытке открыть файл " + filePath + " произошла ошибка: " + ioe);
 
         } finally {
             if (null != nc) try {
               nc.close();
             } catch (IOException ioe) {
-                System.out.println("При попытке закрыть файл " + fileName + " произошла ошибка: " + ioe);
+                System.out.println("При попытке закрыть файл " + filePath + " произошла ошибка: " + ioe);
             }
         }
+        return nc.toString();
+    }
+
+    public void convertIntoTxt(File file){
+        String path = file.getParent() + file.getName().replaceAll(".nc", ".txt");
+        System.out.println(path);
+
+        try(FileWriter fileWriter = new FileWriter(path, false)){
+            fileWriter.append(readWholeFile());
+            fileWriter.flush();
+
+        } catch (IOException e){
+            System.out.println(e);
+        }
+
     }
 
     public void getData(){
@@ -58,7 +60,7 @@ public class Reader {
             String dimensions = "0:70, 70, 50";
             Array data = v.read(dimensions);
 //            System.out.println(data);
-//            NCdumpW.printArray(data, varName, System.out, null);
+            NCdumpW.printArray(data, varName, System.out, null);
             // Вывод всех данных
 //            for (int i = 0; i < data.getSize(); i++){
 //                System.out.println(data.getShort(i));

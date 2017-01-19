@@ -7,11 +7,14 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 
 public class NetCdfGUI {
+    private Reader reader;
+    private JFileChooser openFile;
+    private File file;
+    private String filePath;
     private JFrame mainFrame;
     private JLabel headerLabel;
     private JLabel statusLabel;
     private JPanel controlPanel;
-
 
     public NetCdfGUI(){
         GUI();
@@ -47,12 +50,12 @@ public class NetCdfGUI {
         headerLabel.setText("Control in action: Button");
 
         JButton ok = new JButton("Choose File");
-        JButton submitButton = new JButton("Submit");
-        JButton cancelButton = new JButton("Cancel");
+        JButton submitButton = new JButton("Convert into txt");
+        JButton cancelButton = new JButton("Exit");
 
         ok.setActionCommand("Choose File");
-        submitButton.setActionCommand("Submit");
-        cancelButton.setActionCommand("Cancel");
+        submitButton.setActionCommand("Convert into txt");
+        cancelButton.setActionCommand("Exit");
 
         ok.addActionListener(new ButtonClickListener());
         submitButton.addActionListener(new ButtonClickListener());
@@ -73,20 +76,20 @@ public class NetCdfGUI {
             String command = e.getActionCommand();
             switch (command){
                 case "Choose File":
-                    JFileChooser fileopen = new JFileChooser();
-                    int ret = fileopen.showDialog(null, "Открыть файл");
+                    openFile = new JFileChooser();
+                    int ret = openFile.showDialog(null, "Открыть файл");
                     if (ret == JFileChooser.APPROVE_OPTION) {
-                        File file = fileopen.getSelectedFile();
-                        String filePath = file.getPath();
-                        Reader reader = new Reader(filePath);
+                        file = openFile.getSelectedFile();
+                        filePath = file.getPath();
+                        reader = new Reader(filePath);
                         reader.readWholeFile();
                     }
                     break;
-                case "Submit":
-                    statusLabel.setText("Submit button is clicked");
+                case "Convert into txt":
+                    reader.convertIntoTxt(file);
                     break;
-                case "Cancel":
-                    statusLabel.setText("Ok button is clicked");
+                case "Exit":
+                    System.exit(0);
                     break;
                 default:
                     statusLabel.setText("Error");
