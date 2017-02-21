@@ -8,7 +8,6 @@ import ucar.nc2.dataset.NetcdfDataset;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner;
 
 
 public class Reader {
@@ -16,11 +15,11 @@ public class Reader {
     private String filePath;
 
 
-    public Reader(String filePath){
+    Reader(String filePath){
         this.filePath = filePath;
     }
 
-    public String readWholeFile(){
+    String readWholeFile(){
         try {
             nc = NetcdfDataset.open(filePath, null);
 //            System.out.println(nc.getDimensions().size());
@@ -38,7 +37,7 @@ public class Reader {
         return nc.toString();
     }
 
-    public void convertIntoTxt(File file){
+    void convertIntoTxt(File file){
         String path = file.getParent() + file.getName().replaceAll(".nc", ".txt");
         System.out.println(path);
 

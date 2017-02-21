@@ -6,17 +6,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 
-public class NetCdfGUI {
+class NetCdfGUI {
     private Reader reader;
-    private JFileChooser openFile;
     private File file;
-    private String filePath;
     private JFrame mainFrame;
-    private JLabel headerLabel;
-    private JLabel statusLabel;
     private JPanel controlPanel;
 
-    public NetCdfGUI(){
+    NetCdfGUI(){
         GUI();
         makeSomeAction();
     }
@@ -25,7 +21,7 @@ public class NetCdfGUI {
         mainFrame = new JFrame("NetCDF File reader");
         mainFrame.setSize(300,300);
         mainFrame.setLocation(100, 100);
-        mainFrame.setLayout(new GridLayout(3,1));
+        mainFrame.setLayout(new GridLayout(2,1));
 
         mainFrame.addWindowListener(new WindowAdapter() {
             @Override
@@ -34,21 +30,15 @@ public class NetCdfGUI {
             }
         });
 
-        headerLabel = new JLabel("", JLabel.CENTER);
-        statusLabel = new JLabel("", JLabel.CENTER);
         controlPanel = new JPanel();
         controlPanel.setLayout(new FlowLayout());
 
-        mainFrame.add(headerLabel);
         mainFrame.add(controlPanel);
-        mainFrame.add(statusLabel);
 
         mainFrame.setVisible(true);
     }
 
     private void makeSomeAction(){
-        headerLabel.setText("Control in action: Button");
-
         JButton ok = new JButton("Choose File");
         JButton submitButton = new JButton("Convert into txt");
         JButton cancelButton = new JButton("Exit");
@@ -70,19 +60,28 @@ public class NetCdfGUI {
     }
 
     private class ButtonClickListener implements ActionListener{
-
         @Override
         public void actionPerformed(ActionEvent e) {
             String command = e.getActionCommand();
             switch (command){
                 case "Choose File":
-                    openFile = new JFileChooser();
+                    JFileChooser openFile = new JFileChooser();
                     int ret = openFile.showDialog(null, "Открыть файл");
                     if (ret == JFileChooser.APPROVE_OPTION) {
                         file = openFile.getSelectedFile();
-                        filePath = file.getPath();
-                        reader = new Reader(filePath);
-                        reader.readWholeFile();
+                        if (file.getName().endsWith(".nc")){
+                            String filePath = file.getPath();
+                            reader = new Reader(filePath);
+                            reader.readWholeFile();
+                        }
+                        else {
+                            System.out.println("Error! Choose a netcdf file!");
+                            file = null;
+                        }
+                    }
+                    else {
+                        file = null;
+                        System.out.println("Вы не выбрали файл!");
                     }
                     break;
                 case "Convert into txt":
@@ -92,7 +91,6 @@ public class NetCdfGUI {
                     System.exit(0);
                     break;
                 default:
-                    statusLabel.setText("Error");
                     break;
             }
         }
